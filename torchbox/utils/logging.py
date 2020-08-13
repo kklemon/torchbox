@@ -12,7 +12,7 @@ def setup_logging(logger=None,
     logging.basicConfig(level=log_level,
                         format=format,
                         datefmt=datefmt,
-                        filename=str(log_file))
+                        filename=str(log_file) if log_file else None)
     console = logging.StreamHandler()
     console.setLevel(log_level)
     formatter = logging.Formatter('%(message)s')
