@@ -54,7 +54,6 @@ class Quantize(nn.Module):
         return F.embedding(embed_id, self.embed.transpose(0, 1))
 
 
-
 class Attention(nn.Module):
     def __init__(self, in_dim, key_query_dim, value_dim, n_heads=1, tau=1.0):
         super().__init__()
@@ -187,6 +186,33 @@ class EqualizedConv2d(nn.Module):
                         bias=self.bias if self.use_bias else None,
                         stride=self.stride,
                         padding=self.pad)
+
+
+class EqualizedConvTranspose2d(nn.Module):
+    def __init__(self, c_in, c_out, kernel_size, stride=1, padding=0, bias=True):
+        super().__init__()
+
+        # define the weight and bias if to be used
+        self.weight = nn.Parameter(nn.init.normal_(
+            torch.empty(c_in, c_out, *nn.modules.utils._pair(kernel_size))
+        ))
+
+        self.use_bias = bias
+        self.stride = stride
+        self.pad = padding
+
+        if self.use_bias:
+            self.bias = nn.Parameter(torch.FloatTensor(c_out).fill_(0))
+
+        fan_in = c_in
+        self.scale = np.sqrt(2) / np.sqrt(fan_in)
+
+    def forward(self, x):
+        return F.conv_transpose2d(input=x,
+                                  weight=self.weight * self.scale,  # scale the weight on runtime
+                                  bias=self.bias if self.use_bias else None,
+                                  stride=self.stride,
+                                  padding=self.pad)
 
 
 class PixelwiseNorm(nn.Module):
