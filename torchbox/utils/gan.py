@@ -1,5 +1,6 @@
 import copy
 import warnings
+import torch.nn as nn
 
 
 def update_average(model_tgt, model_src, beta):
@@ -24,8 +25,9 @@ def update_average(model_tgt, model_src, beta):
     toggle_grad(model_src, True)
 
 
-class ModelWrapper:
+class ModelWrapper(nn.Module):
     def __init__(self, model):
+        super().__init__()
         self.model = model
 
     def update(self, model):
