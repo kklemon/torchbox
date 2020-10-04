@@ -80,7 +80,7 @@ def relativistic_average_gan_loss_d(D, reals, fakes, f1, f2):
 
     loss = f1(rf_diff).mean() + f2(fr_diff).mean()
 
-    return loss
+    return loss / 2.0
 
 
 def relativistic_average_gan_loss_g(D, reals, fakes, g1, g2):
