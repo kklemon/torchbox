@@ -31,20 +31,25 @@ class StandardGANLoss(BaseGANLossFunction):
 
 
 class WassersteinGANLoss(BaseGANLossFunction):
-    def __init__(self, D, use_gp=True, reg_lambda=10, drift=0.001):
+    def __init__(self, D, use_gp=True, reg_lambda=10, drift=0.001, gp_every=None):
         self.D = D
         self.use_gp = use_gp
         self.reg_lambda = reg_lambda
         self.drift = drift
+        self.gp_every = gp_every
+        self.step = 0
 
     def gradient_penalty(self, reals, fakes):
         return gradient_penalty(self.D, reals, fakes, reg_lambda=self.reg_lambda)
 
-    def loss_d(self, reals, fakes):
+    def loss_d(self, reals, fakes, update_step=True):
         loss = wasserstein_gan_loss_d(self.D, reals, fakes, drift=self.drift)
 
-        if self.use_gp and self.reg_lambda:
+        if self.use_gp and self.reg_lambda and (not self.gp_every or self.step % self.gp_every == 0):
             loss += self.gradient_penalty(reals, fakes)
+
+        if update_step:
+            self.step += 1
 
         return loss
 
