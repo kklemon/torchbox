@@ -13,6 +13,14 @@ def get_default_device(default: Optional[Union[str, torch.device]] = None):
     return device
 
 
+def get_available_gpu():
+    try:
+        import GPUtil
+    except ImportError:
+        raise ImportError('GPUtil must be installed in order to use get_available_gpu().')
+    return GPUtil.getFirstAvailable(order='load')[0]
+
+
 def setup_run(run_name=None, results_dir='results', create_dirs=('checkpoints', 'samples'), datefmt='%Y-%m-%d_%H-%M-%S'):
     if not run_name:
         run_name = datetime.now().strftime(datefmt)
