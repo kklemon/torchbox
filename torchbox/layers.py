@@ -222,7 +222,6 @@ class EqualizedConvTranspose2d(nn.Module):
 
 class PixelwiseNorm(nn.Module):
     def forward(self, x, alpha=1e-8):
-
         y = x.pow(2.).mean(dim=1, keepdim=True).add(alpha).sqrt()
         y = x / y
         return y
