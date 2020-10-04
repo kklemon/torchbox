@@ -95,13 +95,18 @@ class Attention(nn.Module):
 
 
 class MinibatchStdDev(nn.Module):
-    def forward(self, x, alpha=1e-8):
-        batch_size, _, width, height = x.shape
+    def __init__(self, alpha=1e-8):
+        super().__init__()
+        self.alpha = alpha
+
+    def forward(self, x):
+        shape = x.shape
+        batch_size = shape[0]
 
         y = x - x.mean(dim=0, keepdim=True)
-        y = torch.sqrt(y.pow(2.).mean(dim=0, keepdim=False) + alpha)
-        y = y.mean().view(1, 1, 1, 1)
-        y = y.repeat(batch_size, 1, width, height)
+        y = torch.sqrt(y.pow(2.).mean(dim=0, keepdim=False) + self.alpha)
+        y = y.mean().view([1] * len(shape))
+        y = y.repeat(batch_size, 1, *shape[2:])
         y = torch.cat([x, y], 1)
 
         return y
