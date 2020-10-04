@@ -1,3 +1,4 @@
+import torch
 import torch.nn.functional as F
 
 from torchbox.losses.functional import (
@@ -76,4 +77,11 @@ class RelativisticAverageHingeGANLoss(RelativisticAverageGANLoss):
     def __init__(self, D):
         f1 = lambda x: F.relu(1 - x)
         f2 = lambda x: F.relu(1 + x)
+        super().__init__(D, f1, f2, f1, f2)
+
+
+class RelativisticAverageLeastSquareGANLoss(RelativisticAverageGANLoss):
+    def __init__(self, D):
+        f1 = lambda x: torch.square(x - 1)
+        f2 = lambda x: torch.square(x + 1)
         super().__init__(D, f1, f2, f1, f2)
